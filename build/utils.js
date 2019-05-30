@@ -1,17 +1,17 @@
 'use strict'
 
-const path = require('path')
-const config = require('../config')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+import { posix } from 'path';
+import { build, dev } from '../config';
+import { extract } from 'extract-text-webpack-plugin';
 
-exports.assetsPath = function (_path) {
+export function assetsPath (_path) {
   const assetsSubDirectory = process.env.NODE_ENV === 'production'
-    ? config.build.assetsSubDirectory
-    : config.dev.assetsSubDirectory
-  return path.posix.join(assetsSubDirectory, _path)
+    ? build.assetsSubDirectory
+    : dev.assetsSubDirectory
+  return posix.join(assetsSubDirectory, _path)
 }
 
-exports.cssLoaders = function (options) {
+export function cssLoaders (options) {
   options = options || {}
 
   const cssLoader = {
@@ -37,7 +37,7 @@ exports.cssLoaders = function (options) {
     // Extract CSS when that option is specified
     // (which is the case during production build)
     if (options.extract) {
-      return ExtractTextPlugin.extract({
+      return extract({
         use: loaders,
         fallback: 'vue-style-loader'
       })
@@ -59,9 +59,9 @@ exports.cssLoaders = function (options) {
 }
 
 // Generate loaders for standalone style files (outside of .vue)
-exports.styleLoaders = function (options) {
+export function styleLoaders (options) {
   const output = []
-  const loaders = exports.cssLoaders(options)
+  const loaders = cssLoaders(options)
   for (const extension in loaders) {
     const loader = loaders[extension]
     output.push({

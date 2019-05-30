@@ -2,27 +2,27 @@
 
 require('./check-versions')()
 
-const config = require('../config')
+import { dev } from '../config';
 if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = JSON.parse(config.dev.env.NODE_ENV)
+  process.env.NODE_ENV = JSON.parse(dev.env.NODE_ENV)
 }
 
-const opn = require('open')
-const path = require('path')
-const express = require('express')
-const webpack = require('webpack')
-const proxyMiddleware = require('http-proxy-middleware')
+import opn from 'open';
+import { posix } from 'path';
+import express, { static } from 'express';
+import webpack from 'webpack';
+import proxyMiddleware from 'http-proxy-middleware';
 const webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
   : require('./webpack.dev.conf')
 
 // default port where dev server listens for incoming traffic
-const port = process.env.PORT || config.dev.port
+const port = process.env.PORT || dev.port
 // automatically open browser, if not set will be false
-const autoOpenBrowser = !!config.dev.autoOpenBrowser
+const autoOpenBrowser = !!dev.autoOpenBrowser
 // Define HTTP proxies to your custom API backend
 // https://github.com/chimurai/http-proxy-middleware
-const proxyTable = config.dev.proxyTable
+const proxyTable = dev.proxyTable
 
 const app = express()
 const compiler = webpack(webpackConfig)
@@ -63,8 +63,8 @@ app.use(require('connect-history-api-fallback')())
 app.use(devMiddleware)
 
 // serve pure static assets
-const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
-app.use(staticPath, express.static('./static'))
+const staticPath = posix.join(dev.assetsPublicPath, dev.assetsSubDirectory)
+app.use(staticPath, static('./static'))
 
 const uri = 'http://localhost:' + port
 
@@ -85,9 +85,7 @@ devMiddleware.waitUntilValid(() => {
 
 const server = app.listen(port)
 
-module.exports = {
-  ready: readyPromise,
-  close: () => {
-    server.close()
-  }
+export const ready = readyPromise;
+export function close() {
+  server.close();
 }

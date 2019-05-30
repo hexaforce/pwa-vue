@@ -1,39 +1,39 @@
 'use strict'
 
-const fs = require('fs')
-const path = require('path')
-const utils = require('./utils')
-const webpack = require('webpack')
-const config = require('../config')
-const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { styleLoaders } from './utils';
+import { DefinePlugin, HotModuleReplacementPlugin, NoEmitOnErrorsPlugin } from 'webpack';
+import { dev } from '../config';
+import merge from 'webpack-merge';
+import baseWebpackConfig, { entry } from './webpack.base.conf';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
 
 // add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-  baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
+Object.keys(entry).forEach(function (name) {
+  entry[name] = ['./build/dev-client'].concat(entry[name])
 })
 
-module.exports = merge(baseWebpackConfig, {
+export default merge(baseWebpackConfig, {
   module: {
-    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
+    rules: styleLoaders({ sourceMap: dev.cssSourceMap })
   },
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': config.dev.env
+    new DefinePlugin({
+      'process.env': dev.env
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
+    new HotModuleReplacementPlugin(),
+    new NoEmitOnErrorsPlugin(),
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
       inject: true,
-      serviceWorkerLoader: `<script>${fs.readFileSync(path.join(__dirname,
+      serviceWorkerLoader: `<script>${readFileSync(join(__dirname,
         './service-worker-dev.js'), 'utf-8')}</script>`
     }),
     new FriendlyErrorsPlugin()
